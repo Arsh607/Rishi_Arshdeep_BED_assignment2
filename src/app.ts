@@ -13,7 +13,6 @@ app.use("/api/v1/health", healthRoutes);
 app.use("/api/v1/employees", employeeRoutes);
 app.use("/api/v1/branches", branchRoutes);
 
-// Unified error handler → always { status: "error", message: "..." }
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   console.error("Error occurred:", err);
   res.status((err as any)?.status || 500).json({

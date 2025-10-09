@@ -1,12 +1,16 @@
 import { employees } from "../../../data/employees";
 import { Employee } from "../models/employee";
 
+
 let lastEmployeeId = employees.reduce((max, e) => Math.max(max, e.id), 0);
+
 
 export const listEmployees = (): Employee[] => employees;
 
+
 export const getEmployeeById = (id: number): Employee | undefined =>
   employees.find((e) => e.id === id);
+
 
 export const createEmployee = (payload: Omit<Employee, "id">): Employee => {
   lastEmployeeId += 1;
@@ -14,6 +18,7 @@ export const createEmployee = (payload: Omit<Employee, "id">): Employee => {
   employees.push(out);
   return out;
 };
+
 
 export const updateEmployee = (id: number, patch: Partial<Omit<Employee, "id">>): Employee | undefined => {
   const e = employees.find((x) => x.id === id);

@@ -7,10 +7,12 @@ const server = app.listen(PORT, HOST, () => {
   console.log(`Server running on http://${HOST}:${PORT}`);
 });
 
+
 server.on("error", (err: unknown) => {
   console.error("Failed to start server:", err);
   process.exitCode = 1;
 });
+
 
 const shutdown = (signal: string) => {
   console.log(`\n${signal} received. Closing server...`);
@@ -19,6 +21,7 @@ const shutdown = (signal: string) => {
     process.exit(0);
   });
 };
+
 process.on("SIGINT", () => shutdown("SIGINT"));
 process.on("SIGTERM", () => shutdown("SIGTERM"));
 
