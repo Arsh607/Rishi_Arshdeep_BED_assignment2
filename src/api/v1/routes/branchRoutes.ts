@@ -8,7 +8,7 @@ const router = Router();
 router.get("/", controller.getAll);
 router.get("/:id", controller.getById);
 router.post("/", validate(branchSchema), controller.create);
-router.put("/:id", validate(branchSchema), controller.update);
+router.put("/:id", controller.update);
 router.delete("/:id", controller.remove);
 
 export default router;

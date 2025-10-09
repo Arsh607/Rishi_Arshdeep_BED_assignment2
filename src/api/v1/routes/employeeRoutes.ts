@@ -8,7 +8,7 @@ const router = Router();
 router.get("/", ctrl.getAll);
 router.get("/:id", ctrl.getById);
 router.post("/", validate(employeeSchema), ctrl.create);
-router.put("/:id", validate(employeeSchema), ctrl.update);
+router.put("/:id", ctrl.update);;
 router.delete("/:id", ctrl.remove);
 
 export default router;
