@@ -1,9 +1,14 @@
 import { Router } from "express";
-import * as ctrl from "../controllers/branchController";
+import * as controller from "../controllers/branchController";
+import { validate } from "../middleware/validate";
+import { branchSchema } from "../validation/branchValidation";
+
 const router = Router();
-router.get("/", ctrl.getAll);
-router.post("/", ctrl.create);
-router.get("/:id", ctrl.getById);
-router.put("/:id", ctrl.update);
-router.delete("/:id", ctrl.remove);
+
+router.get("/", controller.getAll);
+router.get("/:id", controller.getById);
+router.post("/", validate(branchSchema), controller.create);
+router.put("/:id", validate(branchSchema), controller.update);
+router.delete("/:id", controller.remove);
+
 export default router;
