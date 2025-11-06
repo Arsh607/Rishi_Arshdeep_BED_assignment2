@@ -23,7 +23,7 @@ describe("Employee Service", () => {
     ];
     mockCollection.get.mockResolvedValue({ docs: mockDocs });
 
-    const result = await service.listEmployees();
+    const result = await service.getAllEmployees();
 
     expect(db.collection).toHaveBeenCalledWith("employees");
     expect(result.length).toBe(2);

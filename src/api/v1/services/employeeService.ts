@@ -1,43 +1,69 @@
 import { db } from "../../../config/firebaseConfig";
-import { Employee } from "../models/employee";
 
-export const listEmployees = async (): Promise<Employee[]> => {
-  const collection = db.collection("employees");
-  const snapshot = await collection.get();
-  return snapshot.docs.map((doc) => ({ id: parseInt(doc.id, 10) || 1, ...doc.data() })) as Employee[];
+let lastNumericId = 0;
+
+export const getAllEmployees = async () => {
+  const snapshot = await db.collection("employees").get();
+  return snapshot.docs.map((doc: any) => ({
+    id: Number(doc.id) || 0,
+    ...doc.data(),
+  }));
 };
 
-export const getEmployeeById = async (id: number): Promise<Employee | null> => {
+export const getEmployeeById = async (id: number) => {
+  const doc = await db.collection("employees").doc(String(id)).get();
+  if (!doc.exists) return null;
+  return { id, ...doc.data() };
+};
+
+export const createEmployee = async (data: any) => {
+  const collectionRef = db.collection("employees");
+  const snapshot = await collectionRef.get();
+
+  if (!snapshot.empty) {
+    const ids = snapshot.docs.map((d: any) => Number(d.id) || 0);
+    lastNumericId = Math.max(...ids) + 1;
+  } else {
+    lastNumericId = 1;
+  }
+
+  const newId = lastNumericId;
+  await collectionRef.doc(String(newId)).set(data);
+  return { id: newId, ...data };
+};
+
+export const updateEmployee = async (id: string | number, updates: any) => {
   const ref = db.collection("employees").doc(String(id));
   const doc = await ref.get();
-  return doc.exists ? ({ id: parseInt(doc.id, 10) || 1, ...doc.data() } as Employee) : null;
+
+  if (!doc.exists) {
+    const snapshot = await db.collection("employees").get();
+    let foundId: string | null = null;
+
+    snapshot.forEach((d) => {
+      const data = d.data();
+      if (Number(data.id) === Number(id)) foundId = d.id;
+    });
+
+    if (!foundId) return null;
+    const foundRef = db.collection("employees").doc(foundId);
+    const foundDoc = await foundRef.get();
+    const currentData = foundDoc.data() || {};
+    const newData = { ...currentData, ...updates };
+    await foundRef.set(newData);
+    return { id: foundId, ...newData };
+  }
+
+  const currentData = doc.data() || {};
+  const newData = { ...currentData, ...updates };
+  await ref.set(newData);
+  return { id, ...newData };
 };
 
-export const createEmployee = async (payload: Employee): Promise<Employee> => {
-  const collection = db.collection("employees");
-  const docRef = await collection.add(payload);
-  const numericId = parseInt(docRef.id, 10) || 1;
-  return { id: numericId, ...payload } as Employee;
-};
-
-export const updateEmployee = async (id: number, payload: Partial<Employee>): Promise<Employee | null> => {
-  const idStr = String(id);
-  const ref = db.collection("employees").doc(idStr);
-  const doc = await ref.get();
-  if (!doc.exists) return null;
-  await ref.update(payload);
-  const updated = { id, ...doc.data(), ...payload };
-  return updated as Employee;
-};
-
-export const deleteEmployee = async (id: number): Promise<boolean> => {
+export const deleteEmployee = async (id: number) => {
   const ref = db.collection("employees").doc(String(id));
   const doc = await ref.get();
   if (!doc.exists) return false;
   await ref.delete();
   return true;
 };
-
-
-
-
