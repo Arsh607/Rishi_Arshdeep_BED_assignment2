@@ -3,6 +3,9 @@ import morgan from "morgan";
 import healthRoutes from "./api/v1/routes/healthRoutes";
 import employeeRoutes from "./api/v1/routes/employeeRoutes";
 import branchRoutes from "./api/v1/routes/branchRoutes";
+import helmet from "helmet";
+import cors from "cors";
+import setupSwagger from "./config/swagger";
 
 const app = express();
 
@@ -22,5 +25,24 @@ const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
 };
 
 app.use(errorHandler);
+
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
+  })
+);
+
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || ["http://localhost:3000"];
+app.use(
+  cors({
+    origin: (origin, cb) => {
+      if (!origin || allowedOrigins.includes(origin)) cb(null, true);
+      else cb(new Error("CORS Not Allowed"));
+    },
+  })
+);
+
+setupSwagger(app);
 
 export default app;
