@@ -1,5 +1,8 @@
 import admin from "firebase-admin";
 import serviceAccount from "./firebaseServiceAccount.json";
+import dotenv from "dotenv";
+dotenv.config();
+
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as admin.ServiceAccount)
