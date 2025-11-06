@@ -1,0 +1,373 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Task Management API Documentation",
+    "version": "1.0.0",
+    "description": "API documentation for the Back-End Assignment 5"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api/v1",
+      "description": "Local server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Branch": {
+        "type": "object",
+        "required": ["name", "address", "phone"],
+        "properties": {
+          "id": { "type": "string", "example": "branch_001" },
+          "name": { "type": "string", "example": "Downtown Service Center" },
+          "address": { "type": "string", "example": "123 King Street W" },
+          "phone": { "type": "string", "example": "416-555-0123" }
+        }
+      },
+      "Employee": {
+        "type": "object",
+        "required": [
+          "name",
+          "position",
+          "department",
+          "email",
+          "phone",
+          "branchId"
+        ],
+        "properties": {
+          "id": { "type": "string", "example": "emp_101" },
+          "name": { "type": "string", "example": "John Doe" },
+          "position": { "type": "string", "example": "Manager" },
+          "department": { "type": "string", "example": "Operations" },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john.doe@example.com"
+          },
+          "phone": { "type": "string", "example": "416-555-0199" },
+          "branchId": { "type": "integer", "example": 1 }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/api/v1/branches": {
+      "get": {
+        "summary": "Retrieve all branches",
+        "description": "Returns a list of all branches stored in the database.",
+        "tags": ["Branches"],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved all branches",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Branch"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error while retrieving branches"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new branch",
+        "description": "Creates a new branch record after validating the input with Joi.",
+        "tags": ["Branches"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Branch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Branch created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Branch"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error (invalid or missing fields)"
+          }
+        }
+      }
+    },
+    "/api/v1/branches/{id}": {
+      "get": {
+        "summary": "Retrieve a single branch by ID",
+        "tags": ["Branches"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "The ID of the branch to retrieve",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Branch found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Branch"
+                }
+              }
+            }
+          },
+          "404": { "description": "Branch not found" }
+        }
+      },
+      "put": {
+        "summary": "Update an existing branch",
+        "tags": ["Branches"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "The ID of the branch to update",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Branch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Branch updated successfully" },
+          "400": { "description": "Invalid input data" },
+          "404": { "description": "Branch not found" }
+        }
+      },
+      "delete": {
+        "summary": "Delete a branch",
+        "tags": ["Branches"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "The ID of the branch to delete",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Branch deleted successfully" },
+          "404": { "description": "Branch not found" }
+        }
+      }
+    },
+    "/api/v1/employees": {
+      "get": {
+        "summary": "Retrieve all employees",
+        "description": "Returns a list of all employees currently stored in the database.",
+        "tags": ["Employees"],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved all employees",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Employee"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error while retrieving employees"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new employee",
+        "description": "Adds a new employee record to the database after validating the request body.",
+        "tags": ["Employees"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Employee"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Employee created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Employee"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error (invalid or missing fields)"
+          }
+        }
+      }
+    },
+    "/api/v1/employees/{id}": {
+      "get": {
+        "summary": "Retrieve a specific employee by ID",
+        "tags": ["Employees"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "The unique ID of the employee",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Employee found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Employee"
+                }
+              }
+            }
+          },
+          "404": { "description": "Employee not found" }
+        }
+      },
+      "put": {
+        "summary": "Update an existing employee",
+        "tags": ["Employees"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "The ID of the employee to update",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Employee"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Employee updated successfully" },
+          "400": { "description": "Invalid input data" },
+          "404": { "description": "Employee not found" }
+        }
+      },
+      "delete": {
+        "summary": "Delete an employee",
+        "tags": ["Employees"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "The ID of the employee to delete",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Employee deleted successfully" },
+          "404": { "description": "Employee not found" }
+        }
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "summary": "Check API health status",
+        "description": "Returns API operational status, uptime, timestamp, and version. Useful for monitoring and CI/CD health checks.",
+        "tags": ["System"],
+        "responses": {
+          "200": {
+            "description": "API is up and running",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "OK" },
+                    "uptime": {
+                      "type": "number",
+                      "description": "System uptime in seconds",
+                      "example": 1234.567
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2025-11-05T17:34:00.000Z"
+                    },
+                    "version": {
+                      "type": "string",
+                      "description": "Current API version",
+                      "example": "1.0.0"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Branches",
+      "description": "Endpoints for managing branches"
+    },
+    {
+      "name": "Employees",
+      "description": "Endpoints for managing employees"
+    },
+    {
+      "name": "System",
+      "description": "API health and system status endpoints"
+    }
+  ]
+}
